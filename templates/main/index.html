@@ -1,0 +1,222 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To do list </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+</head>
+
+<style>
+
+html,
+body {
+    margin: 0;
+    background-image: url('https://i.pinimg.com/originals/eb/1a/1d/eb1a1d9ba44f577f91c445683e58ce7a.jpg');
+    background-size: cover; 
+    padding: 0;
+
+   
+ 
+}
+
+.glow-on-hover {
+    width: 220px;
+    height: 50px;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+}
+
+.glow-on-hover:before {
+    content: '';
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    position: absolute;
+    top: -2px;
+    left:-2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    border-radius: 10px;
+}
+
+.glow-on-hover:active {
+    color: #000
+}
+
+.glow-on-hover:active:after {
+    background: transparent;
+}
+
+.glow-on-hover:hover:before {
+    opacity: 1;
+}
+
+.glow-on-hover:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+}
+
+@keyframes glowing {
+    0% { background-position: 0 0; }
+    50% { background-position: 400% 0; }
+    100% { background-position: 0 0; }
+}
+</style>
+
+
+<body>
+
+  <section class="vh-100 gradient-custom-2">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-12 col-xl-10">
+  
+          <div class="card mask-custom">
+            <div class="card-body p-4 text-salmon">
+  
+              <div class="text-center pt-3 pb-2">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-todo-list/check1.webp"
+
+                  alt="Check" width="60">
+
+                <h2 class="my-4">Task List</h2>
+                {% if request.user.username %}
+                <h6 class="my-4" style="color: red;">@{{request.user.username}}</h6>
+                {% else %}
+                <h6 class="my-4">Anonymous</h6>
+                {% endif %}
+                  {% if request.user.is_authenticated %}
+
+                 <a href="{% url 'logout' %}" style="float: left;" class="btn btn-danger" >Logout</a>
+                  {% else %}
+                 <a href="{% url 'register' %}" style="float: left;" class="btn btn-warning" >Register</a>
+                
+                 <a href="{% url 'login' %}" class="btn btn-success" style="float: left;" >Login</a>
+                 {% endif %}
+                <a href="{% url 'create' %}"><button class="glow-on-hover"  style="float: right; margin-bottom: 30px;" type="button">Create</button></a>
+              </div>
+  
+              <table class="table text-red mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Team Member</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Actions</th>
+                    <th scope="col">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for task in tasks %}
+                  <tr class="fw-normal">
+                    <th>
+                      <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                        alt="avatar 1" style="width: 45px; height: auto;">
+                      <span class="ms-2">{{task.author}}</span>
+                    </th>
+                    <td class="align-middle">
+                      {% if task.completed == True %}
+                     <strike> <span style="background-color: green; color: white;" >{{task.name}}</span></strike>
+                     {% else %}
+                     <span>{{task.name}}</span>
+
+                     {% endif %}
+                    </td>
+                    <td class="align-middle">
+                      {% if task.status == 'Middle' %}
+                      <h6 class="mb-0"><span class="badge bg-warning">{{task.status}}</span></h6>
+                    </td>
+                     {% elif task.status == 'Low' %}
+                     <h6 class="mb-0"><span class="badge bg-danger">{{task.status}}</span></h6>
+                     {% elif task.status == 'High' %}
+                     <h6 class="mb-0"><span class="badge bg-success">{{task.status}}</span></h6>
+                     {% endif %}
+                    <td class="align-middle">
+                      <a href="{% url 'update' task.slug %}" style="font-size: 23px;" data-mdb-toggle="tooltip" title="Done">
+                        <i class="bi bi-pencil-fill" style="color: saddlebrown;"></i></a>
+                      <a href="{% url 'delete' task.slug %}" data-mdb-toggle="tooltip" style="font-size: 23px; margin: 15px;" title="Remove">
+                        <i class="bi bi-x-circle" style="color: red; "></i>
+                      </a>
+                    </td>
+
+                    <td>
+                      {% if task.created == '1 day ago' %}
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-danger">{{task.created |timesince }} ago</span></h6>
+                      {% elif  task.created == '10 hour ago' %}
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-warning">{{task.created |timesince }} ago</span></h6>
+                      {% else %}
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-success">{{task.created |timesince }} ago</span></h6>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% empty %}
+               
+                  
+                  <tr class="fw-normal">
+                    <th>
+                      <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                        alt="avatar 1" style="width: 45px; height: auto;">
+                      <span class="ms-2">there is nobody</span>
+                    </th>
+                    <td class="align-middle">
+                     
+                     <span>there is nothing</span>
+
+                     
+                    </td>
+                    <td class="align-middle">
+                     
+                      <h6 class="mb-0"><span class="badge bg-warning">there is nothing</span></h6>
+                    </td>
+                    
+                    <td class="align-middle">
+                                   
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-danger">there is nothing</span></h6>
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-danger">there is nothing</span></h6>
+                    </td>
+
+                    <td>
+                      
+                      <h6 style="margin-top: 17px;" class="mb-0"><span class="badge bg-danger">there is nothing</span></h6>
+                     
+                    </td>
+                  </tr>
+                  {% endfor %}
+                 
+               
+                </tbody>
+              </table>
+  
+  
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+</body>
+</html>
